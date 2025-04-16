@@ -16,7 +16,7 @@ const port =4000
 //middeleware
 app.use(express.json())
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://nizarnaser.github.io/admin-dubai/',
     credentials: true  // يسمح بإرسال بيانات المصادقة
   }));
 
