@@ -6,7 +6,7 @@ import fs from "fs"
 
 const addCat = async(req,res) => {
     let image_filename = req.file.filename;
-    let imageUrl =`https://backend-repo-v73c.onrender.com/uploads/${image_filename}`;
+    let imageUrl =`https://github.com/NizarNaser/backend-repo/tree/main/uploads/${image_filename}`;
     const cat = new catModel({
         name:req.body.name,
         name_uk:req.body.name_uk,
