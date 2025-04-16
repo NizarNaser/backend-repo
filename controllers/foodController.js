@@ -8,7 +8,7 @@ const addFood = async(req,res) => {
     let image_filename = req.file.filename;
     console.log("📂 File Info:", req.file);
 
-    let imageUrl =`http://localhost:4000/api/cat/uploads/${image_filename}`;
+    let imageUrl =`https://backend-repo-v73c.onrender.com/uploads/${image_filename}`;
     const food = new foodModel({
         name:req.body.name,
         name_uk:req.body.name_uk,
