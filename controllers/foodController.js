@@ -93,20 +93,28 @@ const getOneFood = async (req,res) => {
 
 //update food item
 const updateFood = async (req, res) => {
-    
     try {
-        // البحث عن العنصر الحالي
         const existingFood = await foodModel.findById(req.params.id);
         if (!existingFood) {
             return res.status(404).json({ error: "Food not found" });
         }
 
-        // التحقق من الصورة الجديدة أو الاحتفاظ بالصورة القديمة
-        const image_filename = req.file ? req.file.filename : existingFood.image;
-        console.log(req.body.name)
-        // تحديث البيانات
+        let imageUrl = existingFood.image;
+        let imagePublicId = existingFood.image_public_id;
+
+        if (req.file) {
+            // حذف الصورة القديمة من Cloudinary
+            if (imagePublicId) {
+                await cloudinary.uploader.destroy(imagePublicId);
+            }
+
+            // تخزين الجديدة
+            imageUrl = req.file.path;
+            imagePublicId = req.file.filename;
+        }
+
         const updatedFood = await foodModel.findByIdAndUpdate(
-            req.params.id, 
+            req.params.id,
             {
                 name: req.body.name,
                 name_uk: req.body.name_uk,
@@ -114,7 +122,8 @@ const updateFood = async (req, res) => {
                 price: req.body.price,
                 ves: req.body.ves,
                 category: req.body.category,
-                image: image_filename
+                image: imageUrl,
+                image_public_id: imagePublicId
             },
             { new: true }
         );
@@ -125,5 +134,6 @@ const updateFood = async (req, res) => {
         res.status(500).json({ error: "Error updating food item" });
     }
 };
+
 
 export{addFood,listFood,removeFood,getOneFood,updateFood}
