@@ -5,37 +5,42 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
 
 //add food item
 
-const addFood = async(req,res) => {
-
-    const imageUrl =req.file.path;
-    const publicId = req.file.filename;
-    const food = new foodModel({
-        name:req.body.name,
-        name_uk:req.body.name_uk,
-        description:req.body.description,
-        price:req.body.price,
-        ves:req.body.ves,
-        category:req.body.category,
-        image:imageUrl,
-        image_public_id:publicId
-    })
-
-    try {
-        console.log("Received file:",req.file);
-        if(!req.file){
-            return res.status(400).json({error:"No image uploaded"});
-        }
-        await food.save();
-        res.json({success:true,message:"Food Added"});
-    } catch (error) {
-         res.json({success:false,message:"Error"})
-       
-            
+const addFood = async (req, res) => {
+    // تحقق من وجود الصورة في الطلب
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: "No image uploaded" });
     }
 
+    // معالجة بيانات الطعام
+    const imageUrl = req.file.path; // مسار الصورة، تأكد من أنه صالح
+    const publicId = req.file.filename; // يجب أن يكون لديك ملف فريد من نوعه
+    const { name, name_uk, description, price, ves, category } = req.body;
 
+    // تأكد من وجود البيانات المطلوبة
+    if (!name || !price || !category || !description) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
 
-}
+    const food = new foodModel({
+        name,
+        name_uk,
+        description,
+        price,
+        ves,
+        category,
+        image: imageUrl,
+        image_public_id: publicId
+    });
+
+    try {
+        // حفظ الطعام في قاعدة البيانات
+        await food.save();
+        res.json({ success: true, message: "Food added successfully" });
+    } catch (error) {
+        console.error("Error adding food:", error); // سجّل الخطأ لتتبعه
+        res.status(500).json({ success: false, message: "Error saving food", error: error.message });
+    }
+};
 
 //all food list
 const listFood = async (req,res) => {
