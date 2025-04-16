@@ -1,35 +1,42 @@
 import catModel from "../models/catModel.js";
 import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
+//add cat item
 
+const addCat = async (req, res) => {
+    console.log("–– BODY ––", req.body);
+console.log("–– FILE ––", req.file);
+    // تحقق من وجود الصورة في الطلب
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: "No image uploaded" });
+    }
 
+    // معالجة بيانات الطعام
+    const imageUrl = req.file.path; // مسار الصورة، تأكد من أنه صالح
+    const publicId = req.file.filename; // يجب أن يكون لديك ملف فريد من نوعه
+    const { name, name_uk, addel} = req.body;
 
-//add food item
+    // تأكد من وجود البيانات المطلوبة
+    if (!name || !name_uk || !addel ) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
 
-const addCat = async(req,res) => {
-    const image_filename = req.file.path; 
     const cat = new catModel({
         name:req.body.name,
         name_uk:req.body.name_uk,
         addel:req.body.addel,
-        image:image_filename,
+        image:imageUrl,
     })
 
     try {
-        console.log("Received file:",req.file);
-        if(!req.file){
-            return res.status(400).json({error:"No image uploaded"});
-        }
+        // حفظ الطعام في قاعدة البيانات
         await cat.save();
-        res.json({success:true,message:"cat Added"});
+        res.json({ success: true, message: "cat added successfully" });
     } catch (error) {
-         res.json({success:false,message:"Error"})
-       
-            
+        console.error("Error adding cat:", error); // سجّل الخطأ لتتبعه
+        res.status(500).json({ success: false, message: "Error saving cat", error: error.message });
     }
+};
 
-
-
-}
 
 //all food list
 const listCat = async (req,res) => {
@@ -77,25 +84,38 @@ const getOneCat = async (req,res) => {
       }
 }
 //update cat item
+
+
 const updateCat = async (req, res) => {
-    
     try {
-        // البحث عن العنصر الحالي
-        const existingCat = await catModel.findById(req.params.id);
-        if (!existingCat) {
-            return res.status(404).json({ error: "cat not found" });
+          // البحث عن العنصر الحالي
+          const existingCat = await catModel.findById(req.params.id);
+          if (!existingCat) {
+              return res.status(404).json({ error: "cat not found" });
+          }
+
+        let imageUrl = existingCat.image;
+        let imagePublicId = existingCat.image_public_id;
+
+        if (req.file) {
+            // حذف الصورة القديمة من Cloudinary
+            if (imagePublicId) {
+                await cloudinary.uploader.destroy(imagePublicId);
+            }
+
+            // تخزين الجديدة
+            imageUrl = req.file.path;
+            imagePublicId = req.file.filename;
         }
 
-        const image_url = req.file ? req.file.path : existingFood.image;
-
-        // تحديث البيانات
         const updatedCat = await catModel.findByIdAndUpdate(
-            req.params.id, 
+            req.params.id,
             {
                 name: req.body.name,
                 name_uk: req.body.name_uk,
                 addel: req.body.addel,
-                image: image_url
+                image: imageUrl,
+                image_public_id: imagePublicId
             },
             { new: true }
         );
@@ -106,5 +126,6 @@ const updateCat = async (req, res) => {
         res.status(500).json({ error: "Error updating cat item" });
     }
 };
+
 
 export{addCat,listCat,removeCat,updateCat,getOneCat}
