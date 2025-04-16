@@ -6,6 +6,8 @@ import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudi
 //add food item
 
 const addFood = async (req, res) => {
+    console.log("–– BODY ––", req.body);
+console.log("–– FILE ––", req.file);
     // تحقق من وجود الصورة في الطلب
     if (!req.file) {
         return res.status(400).json({ success: false, message: "No image uploaded" });

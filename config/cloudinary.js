@@ -12,7 +12,8 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'restaurant-images', // اسم مجلد الصور في Cloudinary
-    allowed_formats: ['jpg', 'png', 'jpeg'],
+    allowed_formats: ['jpg', 'png', 'jpeg', "webp"],
+    transformation: [{ width: 300, crop: "limit" }],
   },
 });
 
