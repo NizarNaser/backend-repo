@@ -6,7 +6,7 @@ import fs from "fs"
 
 const addCat = async(req,res) => {
     let image_filename = req.file.filename;
-    let imageUrl =`http://localhost:3000/api/cat/uploads/${image_filename}`;
+    let imageUrl =`http://localhost:4000/api/cat/uploads/${image_filename}`;
     const cat = new catModel({
         name:req.body.name,
         name_uk:req.body.name_uk,

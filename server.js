@@ -11,11 +11,15 @@ import catRouter from "./routes/catRoute.js";
 
 //app config
 const app =express()
-const port =3000
+const port =4000
 
 //middeleware
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true  // يسمح بإرسال بيانات المصادقة
+  }));
+
 app.use(express.urlencoded({ extended: true }));
 //db connection
 connectDB();
