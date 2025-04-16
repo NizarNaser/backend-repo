@@ -1,14 +1,13 @@
 import foodModel from "../models/foodModel.js";
-import fs from "fs"
+import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
 
 
 //add food item
 
 const addFood = async(req,res) => {
-    let image_filename = req.file.filename;
-    console.log("📂 File Info:", req.file);
 
-    let imageUrl =`https://github.com/NizarNaser/backend-repo/tree/main/uploads/${image_filename}`;
+    const imageUrl =req.file.path;
+    const publicId = req.file.filename;
     const food = new foodModel({
         name:req.body.name,
         name_uk:req.body.name_uk,
@@ -17,6 +16,7 @@ const addFood = async(req,res) => {
         ves:req.body.ves,
         category:req.body.category,
         image:imageUrl,
+        image_public_id:publicId
     })
 
     try {
@@ -50,30 +50,27 @@ const listFood = async (req,res) => {
 }
 
 //remove food item
-const removeFood = async (req,res) => {
-  try {
-    const food = await foodModel.findById(req.body.id);
-    fs.unlink(`uploads/${food.image}`,()=>{})
-
-    await foodModel.findByIdAndDelete(req.body.id);
-    res.json({success:true,message:"food Removed"});
-
-  } catch (error) {
-    console.log(error);
-        res.json({success:false,message:"Error"})
-  }
-}
-
-//one food item
-const getOneFood = async (req,res) => {
+const removeFood = async (req, res) => {
     try {
-        const food = await foodModel.findById(req.params.id);
-        if (!food) return res.status(404).json({ error: "Food not found" });
-        res.json(food);
-      } catch (error) {
-        res.status(500).json({ error: "Error fetching food item" });
+      const food = await foodModel.findById(req.body.id);
+      if (!food) {
+        return res.status(404).json({ success: false, message: "Food not found" });
       }
-}
+  
+      // حذف الصورة من Cloudinary
+      if (food.image_public_id) {
+        await cloudinary.uploader.destroy(food.image_public_id);
+      }
+  
+      // حذف العنصر من قاعدة البيانات
+      await foodModel.findByIdAndDelete(req.body.id);
+  
+      res.json({ success: true, message: "Food removed successfully" });
+    } catch (error) {
+      console.log("❌ Remove Error:", error);
+      res.status(500).json({ success: false, message: "Error removing food item" });
+    }
+  };
 
 //update food item
 const updateFood = async (req, res) => {
@@ -85,9 +82,7 @@ const updateFood = async (req, res) => {
             return res.status(404).json({ error: "Food not found" });
         }
 
-        // التحقق من الصورة الجديدة أو الاحتفاظ بالصورة القديمة
-        const image_filename = req.file ? req.file.filename : existingFood.image;
-        console.log(req.body.name)
+        const image_url = req.file ? req.file.path : existingFood.image;
         // تحديث البيانات
         const updatedFood = await foodModel.findByIdAndUpdate(
             req.params.id, 
@@ -98,7 +93,7 @@ const updateFood = async (req, res) => {
                 price: req.body.price,
                 ves: req.body.ves,
                 category: req.body.category,
-                image: image_filename
+                image: image_url
             },
             { new: true }
         );

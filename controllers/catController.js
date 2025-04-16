@@ -1,12 +1,12 @@
 import catModel from "../models/catModel.js";
-import fs from "fs"
+import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
+
 
 
 //add food item
 
 const addCat = async(req,res) => {
-    let image_filename = req.file.filename;
-    let imageUrl =`https://github.com/NizarNaser/backend-repo/tree/main/uploads/${image_filename}`;
+    const image_filename = req.file.path; 
     const cat = new catModel({
         name:req.body.name,
         name_uk:req.body.name_uk,
@@ -45,19 +45,27 @@ const listCat = async (req,res) => {
 }
 
 //remove cat 
-const removeCat = async (req,res) => {
-  try {
-    const cat = await catModel.findById(req.body.id);
-    fs.unlink(`uploads/${cat.image}`,()=>{})
-
-    await catModel.findByIdAndDelete(req.body.id);
-    res.json({success:true,message:"cat Removed"});
-
-  } catch (error) {
-    console.log(error);
-        res.json({success:false,message:"Error"})
-  }
-}
+const removeCat = async (req, res) => {
+    try {
+      const cat = await catModel.findById(req.body.id);
+      if (!cat) {
+        return res.status(404).json({ success: false, message: "cat not found" });
+      }
+  
+      // حذف الصورة من Cloudinary
+      if (cat.image_public_id) {
+        await cloudinary.uploader.destroy(cat.image_public_id);
+      }
+  
+      // حذف العنصر من قاعدة البيانات
+      await catModel.findByIdAndDelete(req.body.id);
+  
+      res.json({ success: true, message: "cat removed successfully" });
+    } catch (error) {
+      console.log("❌ Remove Error:", error);
+      res.status(500).json({ success: false, message: "Error removing cat item" });
+    }
+  };
 //one cat item
 const getOneCat = async (req,res) => {
     try {
@@ -78,9 +86,8 @@ const updateCat = async (req, res) => {
             return res.status(404).json({ error: "cat not found" });
         }
 
-        // التحقق من الصورة الجديدة أو الاحتفاظ بالصورة القديمة
-        const image_filename = req.file ? req.file.filename : existingCat.image;
-        console.log(req.body.name)
+        const image_url = req.file ? req.file.path : existingFood.image;
+
         // تحديث البيانات
         const updatedCat = await catModel.findByIdAndUpdate(
             req.params.id, 
@@ -88,7 +95,7 @@ const updateCat = async (req, res) => {
                 name: req.body.name,
                 name_uk: req.body.name_uk,
                 addel: req.body.addel,
-                image: image_filename
+                image: image_url
             },
             { new: true }
         );
