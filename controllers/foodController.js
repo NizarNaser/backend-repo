@@ -2,6 +2,7 @@ import foodModel from "../models/foodModel.js";
 import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
 
 
+
 //add food item
 
 const addFood = async(req,res) => {
@@ -72,6 +73,17 @@ const removeFood = async (req, res) => {
     }
   };
 
+//one food item
+const getOneFood = async (req,res) => {
+    try {
+        const food = await foodModel.findById(req.params.id);
+        if (!food) return res.status(404).json({ error: "Food not found" });
+        res.json(food);
+      } catch (error) {
+        res.status(500).json({ error: "Error fetching food item" });
+      }
+}
+
 //update food item
 const updateFood = async (req, res) => {
     
@@ -82,7 +94,9 @@ const updateFood = async (req, res) => {
             return res.status(404).json({ error: "Food not found" });
         }
 
-        const image_url = req.file ? req.file.path : existingFood.image;
+        // التحقق من الصورة الجديدة أو الاحتفاظ بالصورة القديمة
+        const image_filename = req.file ? req.file.filename : existingFood.image;
+        console.log(req.body.name)
         // تحديث البيانات
         const updatedFood = await foodModel.findByIdAndUpdate(
             req.params.id, 
@@ -93,7 +107,7 @@ const updateFood = async (req, res) => {
                 price: req.body.price,
                 ves: req.body.ves,
                 category: req.body.category,
-                image: image_url
+                image: image_filename
             },
             { new: true }
         );
