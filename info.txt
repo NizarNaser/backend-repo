@@ -1,2 +1,0 @@
-https://dashboard.render.com/web/srv-cvk5nk95pdvs73a2v3i0/deploys/dep-cvk5nkh5pdvs73a2v3t0
-https://backend-repo-v73c.onrender.com
