@@ -41,5 +41,3 @@ app.listen(port,()=>{
     
 })
 
-
-//mongodb+srv://nizarnaser17:Nizar_1970@cluster0.dlcal.mongodb.net/?
