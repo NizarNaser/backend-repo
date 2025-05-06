@@ -13,9 +13,21 @@ const port =process.env.PORT
 
 //middeleware
 app.use(express.json())
+// ✅ السماح فقط لموقع GitHub Pages
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://deluxe-auto-one.vercel.app",
+    "https://nizarnaser.github.io/"
+  ];
 app.use(cors({
-    origin: 'https://nizarnaser.github.io',
-    credentials: true  // يسمح بإرسال بيانات المصادقة
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   }));
 
 app.use(express.urlencoded({ extended: true }));
