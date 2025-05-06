@@ -15,20 +15,22 @@ const port =process.env.PORT
 app.use(express.json())
 // ✅ السماح فقط لموقع GitHub Pages
 const allowedOrigins = [
-    "http://localhost:5173",
-    "https://dubai-restauranr-karaoke-bar.vercel.app/",
-    "https://nizarnaser.github.io/"
-  ];
+  "http://localhost:5173",
+  "https://dubai-restauranr-karaoke-bar.vercel.app",
+  "https://nizarnaser.github.io"
+];
+
 app.use(cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  }));
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 app.use(express.urlencoded({ extended: true }));
 //db connection
