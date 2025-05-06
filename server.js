@@ -16,7 +16,7 @@ app.use(express.json())
 // ✅ السماح فقط لموقع GitHub Pages
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://deluxe-auto-one.vercel.app",
+    "https://dubai-restauranr-karaoke-bar.vercel.app/",
     "https://nizarnaser.github.io/"
   ];
 app.use(cors({
