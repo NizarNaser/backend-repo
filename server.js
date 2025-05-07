@@ -7,7 +7,7 @@ import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
 import catRouter from "./routes/catRoute.js";
 
-const path = require('path');
+import path from 'path';
 //app config
 const app =express()
 const port =process.env.PORT 
