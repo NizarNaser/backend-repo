@@ -39,15 +39,34 @@ const addFood = async (req, res) => {
 };
 
 // عرض قائمة الأطعمة
+// كاش داخل الذاكرة
+let cachedFoods = null;
+let cacheExpiration = null;
+
 const listFood = async (req, res) => {
+    const now = Date.now();
+
+    // إذا كان الكاش موجود ولم ينتهِ
+    if (cachedFoods && cacheExpiration > now) {
+        return res.json({ success: true, data: cachedFoods, cache: true });
+    }
+
     try {
-        const foods = await foodModel.find({}).select("name description price category image"); // تحديد الحقول المطلوبة فقط
-        res.json({ success: true, data: foods });
+        const foods = await foodModel
+            .find({})
+            .select("name description price category image");
+
+        // تخزين الكاش لمدة 10 دقائق
+        cachedFoods = foods;
+        cacheExpiration = now + 10 * 60 * 1000;
+
+        res.json({ success: true, data: foods, cache: false });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Error fetching foods" });
+        res.status(500).json({ success: false, message: "Error fetching foods" });
     }
 };
+
 
 // حذف طعام
 const removeFood = async (req, res) => {
