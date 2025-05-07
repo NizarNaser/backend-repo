@@ -1,24 +1,19 @@
 import foodModel from "../models/foodModel.js";
 import { cloudinary } from "../config/cloudinary.js"; // ✅ استورد Cloudinary
 
-
-
-//add food item
-
+// إضافة طعام
 const addFood = async (req, res) => {
     console.log("–– BODY ––", req.body);
-console.log("–– FILE ––", req.file);
-    // تحقق من وجود الصورة في الطلب
+    console.log("–– FILE ––", req.file);
+
     if (!req.file) {
         return res.status(400).json({ success: false, message: "No image uploaded" });
     }
 
-    // معالجة بيانات الطعام
-    const imageUrl = req.file.path; // مسار الصورة، تأكد من أنه صالح
-    const publicId = req.file.filename; // يجب أن يكون لديك ملف فريد من نوعه
+    const imageUrl = req.file.path; // مسار الصورة
+    const publicId = req.file.filename; // معرف الصورة
     const { name, name_uk, description, price, ves, category } = req.body;
 
-    // تأكد من وجود البيانات المطلوبة
     if (!name || !price || !category || !description) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
@@ -35,66 +30,69 @@ console.log("–– FILE ––", req.file);
     });
 
     try {
-        // حفظ الطعام في قاعدة البيانات
         await food.save();
         res.json({ success: true, message: "Food added successfully" });
     } catch (error) {
-        console.error("Error adding food:", error); // سجّل الخطأ لتتبعه
+        console.error("Error adding food:", error);
         res.status(500).json({ success: false, message: "Error saving food", error: error.message });
     }
 };
 
-//all food list
-const listFood = async (req,res) => {
+// عرض قائمة الأطعمة
+const listFood = async (req, res) => {
     try {
-        const foods = await foodModel.find({});
-        res.json({success:true,data:foods});
-
+        const foods = await foodModel.find({}).select("name description price category image"); // تحديد الحقول المطلوبة فقط
+        res.json({ success: true, data: foods });
     } catch (error) {
         console.log(error);
-        res.json({success:false,message:"Error"})
-
+        res.json({ success: false, message: "Error fetching foods" });
     }
-}
+};
 
-//remove food item
+// حذف طعام
 const removeFood = async (req, res) => {
-    try {
-      const food = await foodModel.findById(req.body.id);
-      if (!food) {
-        return res.status(404).json({ success: false, message: "Food not found" });
-      }
-  
-      // حذف الصورة من Cloudinary
-      if (food.image_public_id) {
-        await cloudinary.uploader.destroy(food.image_public_id);
-      }
-  
-      // حذف العنصر من قاعدة البيانات
-      await foodModel.findByIdAndDelete(req.body.id);
-  
-      res.json({ success: true, message: "Food removed successfully" });
-    } catch (error) {
-      console.log("❌ Remove Error:", error);
-      res.status(500).json({ success: false, message: "Error removing food item" });
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({ success: false, message: "Food ID is required" });
     }
-  };
 
-//one food item
-const getOneFood = async (req,res) => {
     try {
-        const food = await foodModel.findById(req.params.id);
+        const food = await foodModel.findById(id);
+        if (!food) {
+            return res.status(404).json({ success: false, message: "Food not found" });
+        }
+
+        if (food.image_public_id) {
+            await cloudinary.uploader.destroy(food.image_public_id);
+        }
+
+        await foodModel.findByIdAndDelete(id);
+
+        res.json({ success: true, message: "Food removed successfully" });
+    } catch (error) {
+        console.log("❌ Remove Error:", error);
+        res.status(500).json({ success: false, message: "Error removing food item" });
+    }
+};
+
+// الحصول على طعام واحد
+const getOneFood = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const food = await foodModel.findById(id);
         if (!food) return res.status(404).json({ error: "Food not found" });
         res.json(food);
-      } catch (error) {
+    } catch (error) {
         res.status(500).json({ error: "Error fetching food item" });
-      }
-}
+    }
+};
 
-//update food item
+// تحديث طعام
 const updateFood = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        const existingFood = await foodModel.findById(req.params.id);
+        const existingFood = await foodModel.findById(id);
         if (!existingFood) {
             return res.status(404).json({ error: "Food not found" });
         }
@@ -108,13 +106,13 @@ const updateFood = async (req, res) => {
                 await cloudinary.uploader.destroy(imagePublicId);
             }
 
-            // تخزين الجديدة
+            // تخزين الصورة الجديدة
             imageUrl = req.file.path;
             imagePublicId = req.file.filename;
         }
 
         const updatedFood = await foodModel.findByIdAndUpdate(
-            req.params.id,
+            id,
             {
                 name: req.body.name,
                 name_uk: req.body.name_uk,
@@ -135,5 +133,4 @@ const updateFood = async (req, res) => {
     }
 };
 
-
-export{addFood,listFood,removeFood,getOneFood,updateFood}
+export { addFood, listFood, removeFood, getOneFood, updateFood };
