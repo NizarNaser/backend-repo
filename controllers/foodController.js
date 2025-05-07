@@ -43,13 +43,18 @@ const addFood = async (req, res) => {
 let cachedFoods = null;
 let cacheExpiration = null;
 
-const listFood = async (req, res) => {
-    const now = Date.now();
 
-    // إذا كان الكاش موجود ولم ينتهِ
-    if (cachedFoods && cacheExpiration > now) {
-        return res.json({ success: true, data: cachedFoods, cache: true });
+
+    // عرض قائمة الأطعمة
+const listFood = async (req, res) => {
+    try {
+        const foods = await foodModel.find({}).select("name description price category image"); // تحديد الحقول المطلوبة فقط
+        res.json({ success: true, data: foods });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error fetching foods" });
     }
+
 
     try {
         const foods = await foodModel
