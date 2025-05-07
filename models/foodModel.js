@@ -5,7 +5,7 @@ const foodSchema= new mongoose.Schema({
     name_uk:{type:String,required:true},
     description:{type:String,required:true},
     price:{type:Number,required:true},
-    ves:{type:String,required:false},
+    ves:{type:String,required:true},
     image:{type:String},
     category:{type:String,required:true},
     image_public_id: {type:String} // معرّف الصورة في Cloudinary
