@@ -8,6 +8,13 @@ import cartRouter from "./routes/cartRoute.js";
 import catRouter from "./routes/catRoute.js";
 
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import compression from "compression";
+app.use(compression()); // ضغط الملفات لتحسين الأداء
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 //app config
 const app =express()
 const port =process.env.PORT 
