@@ -12,7 +12,7 @@ const addFood = async (req, res) => {
 
     const imageUrl = req.file.path; // مسار الصورة
     const publicId = req.file.filename; // معرف الصورة
-    const { name, name_uk, description, price, ves, category } = req.body;
+    const { name, name_uk, description, price, gram, category } = req.body;
 
     if (!name || !price || !category || !description) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -23,7 +23,7 @@ const addFood = async (req, res) => {
         name_uk,
         description,
         price,
-        ves,
+        gram,
         category,
         image: imageUrl,
         image_public_id: publicId
@@ -137,7 +137,7 @@ const updateFood = async (req, res) => {
                 name_uk: req.body.name_uk,
                 description: req.body.description,
                 price: req.body.price,
-                ves: req.body.ves,
+                gram: req.body.gram,
                 category: req.body.category,
                 image: imageUrl,
                 image_public_id: imagePublicId
