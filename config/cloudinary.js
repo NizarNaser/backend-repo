@@ -12,12 +12,13 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'restaurant-images',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    allowed_formats: ['webp'], // احفظ فقط بصيغة WebP
     transformation: [
       { width: 300, crop: 'limit' },
-      { fetch_format: 'auto' },     // f_auto
-      { quality: 'auto' },          // q_auto
+      { fetch_format: 'webp' },   // f_webp بدلاً من auto
+      { quality: 'auto' },        // ضغط تلقائي
     ],
+    format: 'webp' // يجبر Cloudinary على حفظ الصورة بتنسيق webp
   }
 });
 
