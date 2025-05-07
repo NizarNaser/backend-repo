@@ -1,4 +1,3 @@
-// config/cloudinary.js
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
@@ -12,14 +11,14 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'restaurant-images',
-    allowed_formats: ['webp'], // احفظ فقط بصيغة WebP
+    allowed_formats: ['webp', 'jpg', 'png'], // يمكنك قبول صيغ متعددة ثم تحويلها إلى WebP
     transformation: [
       { width: 300, crop: 'limit' },
-      { fetch_format: 'webp' },   // f_webp بدلاً من auto
-      { quality: 'auto' },        // ضغط تلقائي
+      { fetch_format: 'webp' },   // التأكد من تحميل الصورة بصيغة WebP
+      { quality: 'auto' },         // ضبط الجودة تلقائيًا
     ],
-    format: 'webp' // يجبر Cloudinary على حفظ الصورة بتنسيق webp
-  }
+    format: 'webp',               // اجعل Cloudinary يحفظ الصور بتنسيق WebP
+  },
 });
 
 export { cloudinary, storage };
