@@ -7,6 +7,7 @@ import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
 import catRouter from "./routes/catRoute.js";
 
+const path = require('path');
 //app config
 const app =express()
 const port =process.env.PORT 
@@ -19,6 +20,11 @@ const allowedOrigins = [
   "https://dubai-restaurant-karaoke-bar.vercel.app",
   "https://nizarnaser.github.io"
 ];
+
+// ملفات ثابتة مع كاش طويل
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '30d', // 30 يوم
+}));
 
 app.use(cors({
   origin: function (origin, callback) {

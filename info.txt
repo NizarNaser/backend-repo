@@ -1,7 +1,7 @@
 https://dubai-restauranr-karaoke-bar.vercel.app/
 nizarnaser17@
 render
-تحويل الصور إلى WebP أو AVIF باستخدام أدوات مثل https://squoosh.app/
+تحويل الصور إلى WebP أو AVIF باستخدام أدوات مثل htt://squoosh.app/ps
 فحص الأداء عبر PageSpeed Insights
 ادخل إلى هذا الرابط:
 👉 https://pagespeed.web.dev/
