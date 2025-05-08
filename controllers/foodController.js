@@ -47,6 +47,8 @@ let cacheExpiration = null;
 
     // عرض قائمة الأطعمة
 const listFood = async (req, res) => {
+   
+
     try {
         const foods = await foodModel.find({}).select("name description price category image"); // تحديد الحقول المطلوبة فقط
         res.json({ success: true, data: foods });
@@ -57,6 +59,7 @@ const listFood = async (req, res) => {
 
 
     try {
+        const now = new Date();
         const foods = await foodModel
             .find({})
             .select("name description price category image");
