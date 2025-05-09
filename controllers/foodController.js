@@ -50,7 +50,7 @@ const listFood = async (req, res) => {
    
 
     try {
-        const foods = await foodModel.find({}).select("name description price gram category image"); // تحديد الحقول المطلوبة فقط
+        const foods = await foodModel.find({}).select("name neme_uk description price gram category image"); // تحديد الحقول المطلوبة فقط
         res.json({ success: true, data: foods });
     } catch (error) {
         console.log(error);
@@ -62,7 +62,7 @@ const listFood = async (req, res) => {
         const now = new Date();
         const foods = await foodModel
             .find({})
-            .select("name description price gram category image");
+            .select("name name_uk description price gram category image");
 
         // تخزين الكاش لمدة 10 دقائق
         cachedFoods = foods;
